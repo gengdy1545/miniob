@@ -495,13 +495,14 @@ RC PaxRecordPageHandler::get_record(const RID &rid, Record &record)
 
   record.set_rid(rid);
   char *data = (char *)malloc(page_header_->record_real_size);
-  record.set_data_owner(data, page_header_->record_real_size);
+  int offset = 0;
   for (int col_id = 0; col_id < page_header_->column_num; ++col_id) {
       char* field_data = get_field_data(rid.slot_num, col_id);
       int field_len = get_field_len(col_id);
-      memcpy(data, field_data, field_len);
-      data += field_len;
+      memcpy(data + offset, field_data, field_len);
+      offset += field_len;
   }
+  record.set_data_owner(data, page_header_->record_real_size);
   return RC::SUCCESS;
 }
 
